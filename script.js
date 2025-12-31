@@ -1,21 +1,24 @@
 let data = [];
 let datosCargados = false;
 
-fetch('./prestaciones.json')
-.then(res => {
-    if (!res.ok) {
-        throw new Error('No se pudo cargar prestaciones.json');
-    }
-    return res.json();
-})
-.then(json => {
-    data = json;
-    datosCargados = true;
-})
-.catch(err => {
-    console.error(err);
-    document.getElementById('resultado').innerHTML =
-        '<p style="color:red;">Error cargando la base de datos</p>';
+document.addEventListener("DOMContentLoaded", () => {
+    fetch('prestaciones.json', { cache: "no-store" })
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('No se pudo cargar prestaciones.json');
+            }
+            return res.json();
+        })
+        .then(json => {
+            data = json;
+            datosCargados = true;
+            console.log("Base de datos cargada:", data.length, "registros");
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('resultado').innerHTML =
+                '<p style="color:red;">Error cargando la base de datos</p>';
+        });
 });
 
 function limpiarCedula(valor) {
@@ -29,7 +32,7 @@ function consultar() {
 
     if (!datosCargados) {
         res.innerHTML =
-            '<p style="color:orange;">Cargando base de datos, intente nuevamente…</p>';
+            '<p style="color:orange;">La base de datos aún se está cargando, intente nuevamente.</p>';
         return;
     }
 
@@ -48,16 +51,16 @@ function consultar() {
 
     if (persona) {
         res.innerHTML = `
-        <p><strong>${persona.NOMBRES} ${persona.APELLIDOS}</strong><br>
-        Estado: ${persona.ESTADO}</p>
-        <p style="color:lightgreen;">
-        Felicitaciones, usted cobrará Prestaciones Sociales
-        </p>`;
+            <p><strong>${persona.NOMBRES} ${persona.APELLIDOS}</strong><br>
+            Estado: ${persona.ESTADO}</p>
+            <p style="color:lightgreen;">
+            Felicitaciones, usted cobrará Prestaciones Sociales
+            </p>`;
     } else {
         res.innerHTML = `
-        <p style="color:yellow;">
-        Lamentablemente, usted NO cobrará Prestaciones Sociales
-        </p>`;
+            <p style="color:yellow;">
+            Lamentablemente, usted NO cobrará Prestaciones Sociales
+            </p>`;
     }
 }
 
