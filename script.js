@@ -1,9 +1,22 @@
-
 let data = [];
+let datosCargados = false;
 
-fetch('prestaciones.json')
-.then(res => res.json())
-.then(json => data = json);
+fetch('./prestaciones.json')
+.then(res => {
+    if (!res.ok) {
+        throw new Error('No se pudo cargar prestaciones.json');
+    }
+    return res.json();
+})
+.then(json => {
+    data = json;
+    datosCargados = true;
+})
+.catch(err => {
+    console.error(err);
+    document.getElementById('resultado').innerHTML =
+        '<p style="color:red;">Error cargando la base de datos</p>';
+});
 
 function limpiarCedula(valor) {
     return String(valor)
@@ -12,16 +25,24 @@ function limpiarCedula(valor) {
 }
 
 function consultar() {
-    const cedulaInput = document.getElementById('cedula').value;
-    const cedula = limpiarCedula(cedulaInput);
     const res = document.getElementById('resultado');
 
-    if (cedula.length < 6) {
-        res.innerHTML = '<p style="color:orange;">Ingrese una cédula válida</p>';
+    if (!datosCargados) {
+        res.innerHTML =
+            '<p style="color:orange;">Cargando base de datos, intente nuevamente…</p>';
         return;
     }
 
-    const persona = data.find(p => 
+    const cedulaInput = document.getElementById('cedula').value;
+    const cedula = limpiarCedula(cedulaInput);
+
+    if (cedula.length < 6) {
+        res.innerHTML =
+            '<p style="color:orange;">Ingrese una cédula válida</p>';
+        return;
+    }
+
+    const persona = data.find(p =>
         limpiarCedula(p.CEDULA) === cedula
     );
 
